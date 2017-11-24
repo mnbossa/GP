@@ -1,0 +1,168 @@
+#+TITLE:     GP - Rasmussen & Williams - Ch. 2: Regression
+#+AUTHOR:
+#+DATE:
+
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+PROPERTY: header-args :eval never-export
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+# #+startup: beamer
+# #+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [presentation]
+# #+LaTeX_CLASS_OPTIONS: [bigger]
+# #+BEAMER_FRAME_LEVEL: 2
+# #+BEAMER_THEME: Madrid
+#+BEAMER_THEME: Boadilla
+#+PROPERTY: header-args :eval never-export
+
+#+LaTeX_HEADER: \setminted[ipython]{frame=lines, fontsize=\tiny}
+#+LaTeX_HEADER: \setminted[python]{frame=lines, fontsize=\tiny}
+#+LaTeX_HEADER: \setminted[haskell]{frame=lines, fontsize=\tiny}
+
+#+LaTeX_HEADER: \usefonttheme[onlymath]{serif}
+
+
+
+* Regression
+** Sampling from prior
+*** GP prior
+
+\begin{eqnarray} \label{eg:GP}
+k({x},{y}) & = & \mathrm{exp}( -\tfrac{1}{2}|{x}-{y}|^2) \\
+\mathbf{f} & \sim & \mathcal{N}(\mathbf{0}, K(\mathbf{x}, \mathbf{x}))
+\end{eqnarray}
+
+
+*** Python code
+
+#+INCLUDE: "./gp01.py" src ipython
+
+#+BEGIN_SRC python :session :exports none
+run gp01.py
+name = 'images/fig01.png';
+#+END_SRC
+
+#+RESULTS:
+
+
+
+#+BEGIN_SRC python :session :exports code
+import matplotlib.pyplot as plt
+plt.figure()
+x = np.linspace(-5,5,150)
+k = rbf(1)
+for i in range(3): plt.plot(x, genSamplesSimple(x,k));
+#+END_SRC
+
+
+*** Random functions in 1D
+
+
+#+BEGIN_SRC python :session :exports results :results file
+plt.savefig(name); name
+#+END_SRC
+
+#+RESULTS:
+[[file:images/fig01.png]]
+
+
+*** Different length scales
+**** :BMCOL:
+   :PROPERTIES:
+   :BEAMER_col: 0.45
+   :END:
+
+
+#+BEGIN_SRC python :session :exports none
+plt.close('all')
+name = 'images/fig02.png'
+#+END_SRC
+
+
+#+BEGIN_SRC python :session :exports code
+scales = [0.2, 1, 5]
+for i in scales:
+  plt.plot(x, genSamplesSimple(x,rbf(i)))
+plt.legend(scales);
+#+END_SRC
+
+
+****                                                                  :BMCOL:
+   :PROPERTIES:
+   :BEAMER_col: 0.45
+   :END:
+
+#+BEGIN_SRC python :session :exports results :results file
+plt.savefig(name); name
+#+END_SRC
+
+
+
+#+RESULTS:
+[[file:images/fig02.png]]
+
+*** Two dimensions
+**** :BMCOL:
+   :PROPERTIES:
+   :BEAMER_col: 0.45
+   :END:
+
+
+#+BEGIN_SRC python :session :exports none
+from mpl_toolkits.mplot3d import axes3d
+from matplotlib import cm
+plt.close('all')
+name = 'images/fig03.png'
+#+END_SRC
+
+#+RESULTS:
+
+
+
+#+BEGIN_SRC python :session :exports code
+x = np.linspace(5,-5,50)
+xx, yy = np.meshgrid(x, x)
+xy = np.concatenate(
+       [xx.reshape([1,-1]),yy.reshape([1,-1])]).T
+z = genSamplesSimple(xy, rbf(2)).reshape([50,50])
+#+END_SRC
+
+#+BEGIN_SRC python :session :exports code
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.plot_surface(xx, yy, z, rstride=8,
+                cstride=8, alpha=0.3)
+cset = ax.contour(xx, yy, z, zdir='z',
+                  offset=-2.5, cmap=cm.coolwarm)
+cset = ax.contour(xx, yy, z, zdir='x',
+                  offset=-5, cmap=cm.coolwarm)
+cset = ax.contour(xx, yy, z, zdir='y',
+                  offset=5, cmap=cm.coolwarm)
+
+ax.set_xlabel('X')
+ax.set_xlim(-5, 5)
+ax.set_ylabel('Y')
+ax.set_ylim(-5, 5)
+ax.set_zlabel('Z')
+ax.set_zlim(-2.5, 2.5)
+#+END_SRC
+
+****                                                                  :BMCOL:
+   :PROPERTIES:
+   :BEAMER_col: 0.6
+   :END:
+
+#+BEGIN_SRC python :session :exports results :results file
+plt.savefig(name); name
+#+END_SRC
+
+#+RESULTS:
+[[file:images/fig03.png]]
+
+
+
+* Exploration and classical hypothesis testing
+** Image noise and artifacts
