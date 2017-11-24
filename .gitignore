@@ -1,6 +1,7 @@
 # org
 ltximg*
 _minted*
+auto*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
