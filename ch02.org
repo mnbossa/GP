@@ -216,20 +216,21 @@ name = 'images/fig04.png';
 #+BEGIN_SRC python :session :exports code
 from numpy import array, sqrt
 
-X = linspace(-4, 4, 150)
-k = rbf(1)
 x = array([-2, 0, 0.1,   1, 3])
 y = array([ 1, 0,   1, 0.6, 1])
+X = linspace(-4, 4, 150)
 
-f_m, V = compPosterior(y, x, rbf(1), X, 0.01)
+k = rbf(1)
+f_m, V = compPosterior(y, x, k, X, 0.01)
+
 s = sqrt(diag(V))
 
 plot(X, f_m, 'r')
-plot(X, f_m+2*s, 'r--')
-plot(X, f_m-2*s, 'r--')
+plot(X, f_m + 2*s, 'r--')
+plot(X, f_m - 2*s, 'r--')
 for i in range(5):
   plot(X, genSamples(X, f_m, V))
-plot(x,y,'ob')
+plot(x, y, 'ob')
 #+END_SRC
 
 
@@ -244,3 +245,57 @@ savefig(name); name
 
 #+RESULTS:
 [[file:images/fig04.png]]
+
+
+
+** Python toolboxes
+*** scikit-learn
+
+**** :BMCOL:
+   :PROPERTIES:
+   :BEAMER_col: 0.43
+   :END:
+
+#+BEGIN_SRC python :session :exports code
+from sklearn.gaussian_process import GaussianProcessRegressor as GPR
+from sklearn.gaussian_process.kernels import RBF
+      # other kernels: Matern, WhiteKernel, ConstantKernel
+
+k = RBF(1) # exactly the same behaviour as before
+# but many kernels can be combined more easily:
+# ConstantKernel() + Matern(length_scale=2, nu=3/2)
+#     + WhiteKernel(noise_level=1)
+
+x = x.reshape([-1,1])  # but now x must be a 2D array
+X = X.reshape([-1,1])
+
+gp = GPR(alpha = 0.01, kernel=k, optimizer = None)
+# it has many more options, in particular, optimizer
+# must be set to None to prevent ML kernel estimation
+
+gp.fit(x, y)
+
+y_pred, sigma = gp.predict(X, return_std=True)
+
+plot(x,y,'ob')
+plot(X, y_pred, 'r')
+plot(X, y_pred + 2*sigma, 'r--'); plot(X, y_pred - 2*sigma, 'r--')
+
+# same results as raw python code
+plot(X, f_m, 'g:')
+plot(X, f_m + 2*s, 'g:'); plot(X, f_m - 2*s, 'g:')
+#+END_SRC
+
+
+**** :BMCOL:
+   :PROPERTIES:
+   :BEAMER_col: 0.5
+   :END:
+
+#+BEGIN_SRC python :session :exports results :results file
+name = 'images/fig05.png';
+savefig(name); name
+#+END_SRC
+
+#+RESULTS:
+[[file:images/fig05.png]]
