@@ -221,7 +221,7 @@ y = array([ 1, 0,   1, 0.6, 1])
 X = linspace(-4, 4, 150)
 
 k = rbf(1)
-f_m, V = compPosterior(y, x, k, X, 0.01)
+f_m, V, _ = compPosterior(y, x, k, X, 0.01)
 
 s = sqrt(diag(V))
 
@@ -299,3 +299,52 @@ savefig(name); name
 
 #+RESULTS:
 [[file:images/fig05.png]]
+
+*** GPFlow
+
+**** :BMCOL:
+   :PROPERTIES:
+   :BEAMER_col: 0.43
+   :END:
+
+#+BEGIN_SRC python :session :exports code
+import gpflow
+
+Y = y.reshape(-1,1)
+
+k = gpflow.kernels.RBF(1)
+
+m = gpflow.models.gpr(x, Y, kern=k)
+
+m.likelihood.variance = 0.01
+
+f, sgpf =  m.predict_y(X)
+
+
+plot(x,y,'ob')
+plot(X, f, 'r')
+plot(X, f + 2*sqrt(sgpf), 'r--'); plot(X, f - 2*sqrt(sgpf), 'r--')
+
+# similar (not identical) to previous results
+plot(X, f_m, 'g:')
+plot(X, f_m + 2*s, 'g:'); plot(X, f_m - 2*s, 'g:')
+#+END_SRC
+
+
+
+**** :BMCOL:
+   :PROPERTIES:
+   :BEAMER_col: 0.5
+   :END:
+
+#+BEGIN_SRC python :session :exports results :results file
+name = 'images/fig06.png';
+savefig(name); name
+#+END_SRC
+
+#+RESULTS:
+[[file:images/fig06.png]]
+
+
+
+

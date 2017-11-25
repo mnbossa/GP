@@ -1,4 +1,4 @@
-% Created 2017-11-25 Sat 19:00
+% Created 2017-11-25 Sat 23:21
 % Intended LaTeX compiler: pdflatex
 \documentclass[presentation]{beamer}
 \usepackage[utf8]{inputenc}
@@ -39,10 +39,10 @@
 
 
 \section{Regression}
-\label{sec:org588dcf2}
+\label{sec:org3d71448}
 \subsection{Sampling from prior}
-\label{sec:org267b359}
-\begin{frame}[label={sec:org7f0b3e2}]{GP prior}
+\label{sec:org64f8d75}
+\begin{frame}[label={sec:orgdcb592e}]{GP prior}
 \begin{eqnarray} \label{eg:GP}
 k({x},{y}) & = & \mathrm{exp}( -\tfrac{1}{2}|{x}-{y}|^2) \\
 \mathbf{f} & \sim & \mathcal{N}(\mathbf{0}, K(\mathbf{x}, \mathbf{x}))
@@ -50,7 +50,7 @@ k({x},{y}) & = & \mathrm{exp}( -\tfrac{1}{2}|{x}-{y}|^2) \\
 \end{frame}
 
 
-\begin{frame}[fragile,label={sec:org16805f4}]{Sampling from prior: Python code}
+\begin{frame}[fragile,label={sec:org8e2c1de}]{Sampling from prior: Python code}
  \begin{minted}[]{ipython}
 from numpy import sum, eye, exp #, zeros
 from numpy.linalg import cholesky
@@ -89,14 +89,14 @@ for i in range(3): plot(x, genSamplesSimple(x,k));
 
 
 
-\begin{frame}[label={sec:org64b71b3}]{Random functions in 1D}
+\begin{frame}[label={sec:org784dca8}]{Random functions in 1D}
 \begin{center}
 \includegraphics[width=.9\linewidth]{images/fig01.png}
 \end{center}
 \end{frame}
 
 
-\begin{frame}[fragile,label={sec:orgdb4749f}]{Different length scales}
+\begin{frame}[fragile,label={sec:orgc683272}]{Different length scales}
  \begin{columns}
 \begin{column}{0.45\columnwidth}
 \begin{minted}[]{python}
@@ -116,7 +116,7 @@ legend(scales)
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org3f5be2a}]{Two dimensions}
+\begin{frame}[fragile,label={sec:org567c09a}]{Two dimensions}
  \begin{columns}
 \begin{column}{0.4\columnwidth}
 \begin{minted}[]{python}
@@ -164,8 +164,8 @@ ax.set_zlim(-2.5, 2.5)
 
 
 \subsection{Posterior}
-\label{sec:orgdd9bf75}
-\begin{frame}[label={sec:org8de09d0}]{Computing posterior}
+\label{sec:org3a2e343}
+\begin{frame}[label={sec:org9830ef7}]{Computing posterior}
 \begin{eqnarray*}
 \left[ \begin{array}{c} \mathbf{y} \\ \mathbf{f}_* \end{array} \right]
 & \sim & \mathcal{N}\left( \mathbf{0},
@@ -189,7 +189,7 @@ V & = & L^{-1} K(X,X_*)
 \end{eqnarray*}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org965f7c9}]{Python code}
+\begin{frame}[fragile,label={sec:orgae35b2d}]{Python code}
  \begin{minted}[]{ipython}
 from numpy import pi, eye, log, diag
 from numpy.random import normal
@@ -214,7 +214,7 @@ def genSamples(x, m, K):
 \end{minted}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org9f2662d}]{Fitting some data}
+\begin{frame}[fragile,label={sec:orgc85e828}]{Fitting some data}
  \begin{columns}
 \begin{column}{0.35\columnwidth}
 \begin{minted}[]{python}
@@ -225,7 +225,7 @@ y = array([ 1, 0,   1, 0.6, 1])
 X = linspace(-4, 4, 150)
 
 k = rbf(1)
-f_m, V = compPosterior(y, x, k, X, 0.01)
+f_m, V, _ = compPosterior(y, x, k, X, 0.01)
 
 s = sqrt(diag(V))
 
@@ -250,8 +250,8 @@ plot(x, y, 'ob')
 
 
 \subsection{Python toolboxes}
-\label{sec:org8a4d333}
-\begin{frame}[fragile,label={sec:orgf7dfafd}]{scikit-learn}
+\label{sec:orgc9ade99}
+\begin{frame}[fragile,label={sec:org3522d36}]{scikit-learn}
  \begin{columns}
 \begin{column}{0.43\columnwidth}
 \begin{minted}[]{python}
@@ -289,6 +289,43 @@ plot(X, f_m + 2*s, 'g:'); plot(X, f_m - 2*s, 'g:')
 \begin{column}{0.5\columnwidth}
 \begin{center}
 \includegraphics[width=.9\linewidth]{images/fig05.png}
+\end{center}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile,label={sec:org5ac90d9}]{GPFlow}
+ \begin{columns}
+\begin{column}{0.43\columnwidth}
+\begin{minted}[]{python}
+import gpflow
+
+Y = y.reshape(-1,1)
+
+k = gpflow.kernels.RBF(1)
+
+m = gpflow.models.gpr(x, Y, kern=k)
+
+m.likelihood.variance = 0.01
+
+f, sgpf =  m.predict_y(X)
+
+
+plot(x,y,'ob')
+plot(X, f, 'r')
+plot(X, f + 2*sqrt(sgpf), 'r--'); plot(X, f - 2*sqrt(sgpf), 'r--')
+
+# similar (not identical) to previous results
+plot(X, f_m, 'g:')
+plot(X, f_m + 2*s, 'g:'); plot(X, f_m - 2*s, 'g:')
+\end{minted}
+\end{column}
+
+
+
+\begin{column}{0.5\columnwidth}
+\begin{center}
+\includegraphics[width=.9\linewidth]{images/fig06.png}
 \end{center}
 \end{column}
 \end{columns}
