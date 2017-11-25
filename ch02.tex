@@ -1,4 +1,4 @@
-% Created 2017-11-24 Fri 23:16
+% Created 2017-11-25 Sat 17:12
 % Intended LaTeX compiler: pdflatex
 \documentclass[presentation]{beamer}
 \usepackage[utf8]{inputenc}
@@ -39,10 +39,10 @@
 
 
 \section{Regression}
-\label{sec:org1488376}
+\label{sec:orgfdbac7e}
 \subsection{Sampling from prior}
-\label{sec:org2258d4b}
-\begin{frame}[label={sec:org2857a18}]{GP prior}
+\label{sec:org8ef209e}
+\begin{frame}[label={sec:org86e9e82}]{GP prior}
 \begin{eqnarray} \label{eg:GP}
 k({x},{y}) & = & \mathrm{exp}( -\tfrac{1}{2}|{x}-{y}|^2) \\
 \mathbf{f} & \sim & \mathcal{N}(\mathbf{0}, K(\mathbf{x}, \mathbf{x}))
@@ -50,7 +50,7 @@ k({x},{y}) & = & \mathrm{exp}( -\tfrac{1}{2}|{x}-{y}|^2) \\
 \end{frame}
 
 
-\begin{frame}[fragile,label={sec:org6733ffb}]{Sampling from prior: Python code}
+\begin{frame}[fragile,label={sec:orgabe92c4}]{Sampling from prior: Python code}
  \begin{minted}[]{ipython}
 from numpy import sum, eye, exp #, zeros
 from numpy.linalg import cholesky
@@ -89,14 +89,14 @@ for i in range(3): plot(x, genSamplesSimple(x,k));
 
 
 
-\begin{frame}[label={sec:orgac7ba93}]{Random functions in 1D}
+\begin{frame}[label={sec:org509ea7a}]{Random functions in 1D}
 \begin{center}
 \includegraphics[width=.9\linewidth]{images/fig01.png}
 \end{center}
 \end{frame}
 
 
-\begin{frame}[fragile,label={sec:orgb0b5bc7}]{Different length scales}
+\begin{frame}[fragile,label={sec:org47395f3}]{Different length scales}
  \begin{columns}
 \begin{column}{0.45\columnwidth}
 \begin{minted}[]{python}
@@ -116,7 +116,7 @@ legend(scales)
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org4d51642}]{Two dimensions}
+\begin{frame}[fragile,label={sec:org1e870dc}]{Two dimensions}
  \begin{columns}
 \begin{column}{0.4\columnwidth}
 \begin{minted}[]{python}
@@ -164,8 +164,32 @@ ax.set_zlim(-2.5, 2.5)
 
 
 \subsection{Posterior}
-\label{sec:org1c9a367}
-\begin{frame}[fragile,label={sec:orgc5a806b}]{Computing posterior and sampling: Python code}
+\label{sec:org8ed99b2}
+\begin{frame}[label={sec:orgcd6ab0c}]{Computing posterior}
+\begin{eqnarray*}
+\left[ \begin{array}{c} \mathbf{y} \\ \mathbf{f}_* \end{array} \right]
+& \sim & \mathcal{N}\left( \mathbf{0},
+\left[ \begin{array}{cc} K(X,X) + \sigma^2 I & K(X,X_*) \\
+                         K(X_*,X)            & K(X_*,X_*) \end{array}
+\right] \right) \\
+\mathbf{f}_* | X, \mathbf{y}, X_* & \sim & \mathcal{N}(\overline{ \mathbf f}_*,
+                                                       \mathrm{cov}(\mathbf f_* ))  \\
+\overline{\mathbf f}_* & = & K(X_*,X) [K(X,X) + \sigma^2 I]^{-1}\mathbf y \\
+& = & K(X_*,X) \mathbf \alpha \\
+\mathrm{cov}(\mathbf f_*) & = & K(X_*,X_*) - K(X_*,X)  [K(X,X) + \sigma^2 I]^{-1} K(X,X_*) \\
+ & = & K(X_*,K_*) - V^T V
+\end{eqnarray*}
+
+Where
+\begin{eqnarray*}
+L & = & \mathrm{chol}( K(X,X) + \sigma^2 I) \rightarrow  L L^T = K(X,X) + \sigma^2 I \\
+\mathbf \alpha & = &  [K(X,X) + \sigma^2 I]^{-1}\mathbf y =
+L^{-T} L^{-1} \mathbf y\\
+V & = & L^{-1} K(X,X_*)
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}[fragile,label={sec:orgc1ddb9a}]{Python code}
  \begin{minted}[]{ipython}
 from numpy import pi, eye, log, diag
 from numpy.random import normal
@@ -190,7 +214,7 @@ def genSamples(x, m, K):
 \end{minted}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org69f970c}]{Fitting some data}
+\begin{frame}[fragile,label={sec:orgb14a4b9}]{Fitting some data}
  \begin{columns}
 \begin{column}{0.35\columnwidth}
 \begin{minted}[]{python}

@@ -173,7 +173,31 @@ savefig(name); name
 
 
 ** Posterior
-*** Computing posterior and sampling: Python code
+*** Computing posterior
+
+\begin{eqnarray*}
+\left[ \begin{array}{c} \mathbf{y} \\ \mathbf{f}_* \end{array} \right]
+& \sim & \mathcal{N}\left( \mathbf{0},
+\left[ \begin{array}{cc} K(X,X) + \sigma^2 I & K(X,X_*) \\
+                         K(X_*,X)            & K(X_*,X_*) \end{array}
+\right] \right) \\
+\mathbf{f}_* | X, \mathbf{y}, X_* & \sim & \mathcal{N}(\overline{ \mathbf f}_*,
+                                                       \mathrm{cov}(\mathbf f_* ))  \\
+\overline{\mathbf f}_* & = & K(X_*,X) [K(X,X) + \sigma^2 I]^{-1}\mathbf y \\
+& = & K(X_*,X) \mathbf \alpha \\
+\mathrm{cov}(\mathbf f_*) & = & K(X_*,X_*) - K(X_*,X)  [K(X,X) + \sigma^2 I]^{-1} K(X,X_*) \\
+ & = & K(X_*,K_*) - V^T V
+\end{eqnarray*}
+
+Where
+\begin{eqnarray*}
+L & = & \mathrm{chol}( K(X,X) + \sigma^2 I) \rightarrow  L L^T = K(X,X) + \sigma^2 I \\
+\mathbf \alpha & = &  [K(X,X) + \sigma^2 I]^{-1}\mathbf y =
+L^{-T} L^{-1} \mathbf y\\
+V & = & L^{-1} K(X,X_*)
+\end{eqnarray*}
+
+*** Python code
 
 #+INCLUDE: "./gp02.py" src ipython
 
