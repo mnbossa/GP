@@ -1,4 +1,4 @@
-% Created 2017-11-26 Sun 02:46
+% Created 2017-11-26 Sun 22:34
 % Intended LaTeX compiler: pdflatex
 \documentclass[presentation]{beamer}
 \usepackage[utf8]{inputenc}
@@ -39,10 +39,10 @@
 
 
 \section{Regression}
-\label{sec:org478f96c}
+\label{sec:org1e56278}
 \subsection{Sampling from prior}
-\label{sec:org496a9bb}
-\begin{frame}[label={sec:orgf96bf03}]{GP prior}
+\label{sec:orgff85f5b}
+\begin{frame}[label={sec:org7716c90}]{GP prior}
 \begin{eqnarray} \label{eg:GP}
 k({x},{y}) & = & \mathrm{exp}( -\tfrac{1}{2}|{x}-{y}|^2) \\
 \mathbf{f} & \sim & \mathcal{N}(\mathbf{0}, K(\mathbf{x}, \mathbf{x}))
@@ -50,7 +50,7 @@ k({x},{y}) & = & \mathrm{exp}( -\tfrac{1}{2}|{x}-{y}|^2) \\
 \end{frame}
 
 
-\begin{frame}[fragile,label={sec:orga9b4379}]{Sampling from prior: Python code}
+\begin{frame}[fragile,label={sec:orga64b8c0}]{Sampling from prior: Python code}
  \begin{minted}[]{ipython}
 from numpy import sum, eye, exp #, zeros
 from numpy.linalg import cholesky
@@ -89,14 +89,14 @@ for i in range(3): plot(x, genSamplesSimple(x,k));
 
 
 
-\begin{frame}[label={sec:org324f96e}]{Random functions in 1D}
+\begin{frame}[label={sec:orgdb50f61}]{Random functions in 1D}
 \begin{center}
 \includegraphics[width=.9\linewidth]{images/fig01.png}
 \end{center}
 \end{frame}
 
 
-\begin{frame}[fragile,label={sec:org3128776}]{Different length scales}
+\begin{frame}[fragile,label={sec:org9702e2c}]{Different length scales}
  \begin{columns}
 \begin{column}{0.45\columnwidth}
 \begin{minted}[]{python}
@@ -116,7 +116,7 @@ legend(scales)
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org2b9dcf5}]{Two dimensions}
+\begin{frame}[fragile,label={sec:org41badcd}]{Two dimensions}
  \begin{columns}
 \begin{column}{0.4\columnwidth}
 \begin{minted}[]{python}
@@ -164,8 +164,8 @@ ax.set_zlim(-2.5, 2.5)
 
 
 \subsection{Posterior}
-\label{sec:org64538f0}
-\begin{frame}[label={sec:org202d76c}]{Computing posterior}
+\label{sec:org4e46858}
+\begin{frame}[label={sec:orgd710ae9}]{Computing posterior}
 \begin{eqnarray*}
 \left[ \begin{array}{c} \mathbf{y} \\ \mathbf{f}_* \end{array} \right]
 & \sim & \mathcal{N}\left( \mathbf{0},
@@ -189,7 +189,7 @@ V & = & L^{-1} K(X,X_*)
 \end{eqnarray*}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgcae9f33}]{Python code}
+\begin{frame}[fragile,label={sec:orgdfdf0f8}]{Python code}
  \begin{minted}[]{ipython}
 from numpy import pi, eye, log, diag
 from numpy.random import normal
@@ -214,7 +214,7 @@ def genSamples(x, m, K):
 \end{minted}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org7b6924d}]{Fitting some data}
+\begin{frame}[fragile,label={sec:orgaf909bf}]{Fitting some data}
  \begin{columns}
 \begin{column}{0.35\columnwidth}
 \begin{minted}[]{python}
@@ -251,8 +251,8 @@ legend()
 
 
 \subsection{Python toolboxes}
-\label{sec:orgc4dc1bc}
-\begin{frame}[fragile,label={sec:org97e5b4c}]{scikit-learn}
+\label{sec:orgd2ed9ef}
+\begin{frame}[fragile,label={sec:org34ca857}]{scikit-learn}
  \begin{columns}
 \begin{column}{0.43\columnwidth}
 \begin{minted}[]{python}
@@ -295,7 +295,7 @@ plot(X, f_m + 2*s, 'g:'); plot(X, f_m - 2*s, 'g:')
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgabd5de5}]{GPFlow}
+\begin{frame}[fragile,label={sec:orgd1730e3}]{GPFlow}
  \begin{columns}
 \begin{column}{0.43\columnwidth}
 \begin{minted}[]{python}
@@ -333,54 +333,200 @@ plot(X, f_m + 2*s, 'g:'); plot(X, f_m - 2*s, 'g:')
 \end{frame}
 
 
-\begin{frame}[label={sec:orgbb61594}]{PyMC3}
+\begin{frame}[label={sec:org7352c7a}]{PyMC3}
 \end{frame}
 
-\begin{frame}[label={sec:orgcf4cd38}]{Edward}
+\begin{frame}[label={sec:org2f5ab8a}]{Edward}
 \end{frame}
 
-\begin{frame}[label={sec:org1ea5bba}]{PyStan}
+\begin{frame}[label={sec:orgc65f091}]{PyStan}
 \end{frame}
 
 \subsection{Haskell code}
-\label{sec:org6129ca5}
+\label{sec:orgba9b81b}
 
-\begin{frame}[fragile,label={sec:org059fbf5}]{Sampling from prior: Haskell code}
+\begin{frame}[fragile,label={sec:org600c7d3}]{Sampling from prior: Haskell code}
  \begin{minted}[]{haskell}
+module Gp00 where
 import Numeric.LinearAlgebra
 
 type DVector = Vector Double
 type DMatrix = Matrix Double
-
 type CovarianceMatrix = Matrix Double
-type Kernel = DVector -> DVector -> CovarianceMatrix 
+type Kernel = DMatrix -> DMatrix -> CovarianceMatrix 
+
+sumElems :: DVector -> Double
+sumElems = sumElements 
 
 rbf :: Double -> Kernel
-rbf k x y = exp $ -((asColumn x - asRow y) / scalar k )^2
+rbf l xm ym = exp $ - (len xm >< len ym) [d x y | x <- toRows xm, y <- toRows ym ] 
+  where d a b = sumElems $ (( a - b ) / scalar l)^2
+        len   = fst . size
+-- forDVectors: rbf l x y = exp $ -((asColumn x - asRow y) / scalar l )^2
+\end{minted}
+\begin{minted}[]{haskell}
+import Numeric.LinearAlgebra
+import Gp00
 
-genSamplesSimple :: DVector -> Kernel -> IO DVector
+genSamplesSimple :: DMatrix -> Kernel -> IO DVector
 genSamplesSimple x k = do
   r <- randn n 1 -- also see multivariate normal: gaussianSample
   return $ flatten (tr l <> r)
-  where
-    n = size x
-    l = chol . sym $ k x x + ident n * 1e-8
-\end{minted}
-
-\begin{minted}[]{haskell}
-import Graphics.Matplotlib
-
-let x =  linspace 150 (-5, 5) :: DVector
-let k = rbf 1
-
-y <- sequence [genSamplesSimple x k | i <- [1..3]]
-file name $ plot x (y!!0) % plot x (y!!1) % plot x (y!!2)
+  where n = fst . size $ x
+        l = chol . sym $ k x x + ident n * 1e-8
 \end{minted}
 \end{frame}
 
-\begin{frame}[label={sec:org093c850}]{Random functions in 1D}
+\begin{frame}[fragile,label={sec:orgc07a768}]{Random functions in 1D}
+ \begin{columns}
+\begin{column}{0.55\columnwidth}
+\begin{minted}[]{haskell}
+-- 1D
+import Graphics.Matplotlib
+
+let x =  asColumn $ linspace 150 (-5, 5) :: DMatrix
+let k = rbf 1
+
+y <- sequence [genSamplesSimple x k | i <- [1..3]]
+
+let plotCurve i z = plot (flatten x) (z!!i)
+
+file "images/fig07.png" $ plotCurve 0 y % plotCurve 1 y % plotCurve 2 y
+\end{minted}
+
+\begin{minted}[]{haskell}
+-- Different length scales
+
+let scales = [0.2, 1, 5]
+
+y' <- sequence [genSamplesSimple x (rbf (scales!!i)) | i <- [0..2]]
+
+file "images/fig08.png" $ plotCurve 0 y' % plotCurve 1 y' % plotCurve 2 y'
+\end{minted}
+\end{column}
+
+\begin{column}{0.4\columnwidth}
 \begin{center}
 \includegraphics[width=.9\linewidth]{images/fig07.png}
 \end{center}
+
+\begin{center}
+\includegraphics[width=.9\linewidth]{images/fig08.png}
+\end{center}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile,label={sec:orgb5f35fa}]{2D}
+ \begin{columns}
+\begin{column}{0.35\columnwidth}
+\begin{minted}[]{haskell}
+
+let x =  asColumn $ linspace 50 (-5, 5) :: DMatrix
+let xx = asColumn . flatten $ repmat     x   1 50
+let yy = asColumn . flatten $ repmat (tr x) 50  1
+
+let xy = xx ||| yy
+
+
+
+
+
+
+
+z <- genSamplesSimple xy (rbf 3)
+
+
+
+
+
+
+
+x2ind i = round $ (i + 5.1)*4.9
+fz i j = reshape 50 z ! x2ind i ! x2ind j
+
+
+
+
+file "images/fig09.png" $ contourF fz (-5) 5 (-5) 5 50
+
+\end{minted}
+\end{column}
+
+
+
+\begin{column}{0.65\columnwidth}
+\begin{center}
+\includegraphics[width=.9\linewidth]{images/fig09.png}
+\end{center}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile,label={sec:org8996b4b}]{Computing posterior: Haskell code}
+ \begin{minted}[]{haskell}
+import Numeric.LinearAlgebra
+import Gp00
+
+compPosterior :: DVector -> DMatrix -> Kernel -> DMatrix -> Double 
+                     -> (DVector, DMatrix, Double)
+compPosterior y x k x' snoise = (f, vf, log_p) 
+  where n     = fst . size $ x
+        kxx'  = k x x'
+        l     =  tr $ chol . sym $ k x x + ident n * scalar (snoise + 1e-8)
+        alpha = triSolve Upper (tr l) $ triSolve Lower l (asColumn y)
+        f     = flatten $ tr kxx' <> alpha
+        v     = triSolve Lower l kxx'
+        vf    = k x' x' - tr v <> v
+        log_p = - 0.5* y <.> flatten alpha -  0.5*fromIntegral n * log (2*pi) 
+                - (sumElements . log . takeDiag ) l 
+
+genSamples :: DMatrix -> DVector -> DMatrix -> IO DVector 
+genSamples x m k = do
+   r <- randn n 1 
+   return $ m + flatten (tr l <> r)
+   where n = fst . size $ x
+         l = chol . sym $ k + ident n * 1e-8
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile,label={sec:org4838cd5}]{Fitting some data}
+ \begin{columns}
+\begin{column}{0.37\columnwidth}
+\begin{minted}[]{haskell}
+let x  =  (5><1) [-2, 0, 0.1,   1, 3] :: DMatrix
+let y  =  vector [ 1, 0,   1, 0.6, 1] :: DVector
+let x' =  asColumn $ linspace 150 (-4, 4) :: DMatrix
+let k = rbf 1
+
+
+(f, vf, _) = compPosterior y x k x' 0.01
+s = sqrt $ takeDiag vf
+
+z <- sequence [genSamples x' f vf  | i <- [1..5]]
+
+plCurve i = plot (flatten x') (z!!i)
+plCurves i = if i == 1 then plCurve 1 
+             else plCurve i % plCurves (i-1)
+
+plMean = plot (flatten x') f @@ [o1 "r--"] 
+plCI1  = plot (flatten x') (f + 2*s) @@ [o1 "r:"] 
+plCI2  = plot (flatten x') (f - 2*s) @@ [o1 "r:"] 
+
+plData =  plot (flatten x) y @@ [o1 "bo"]
+
+
+
+file name $ plMean % plCurves 4 % plData % plCI2 % plCI1
+\end{minted}
+\end{column}
+
+
+\begin{column}{0.55\columnwidth}
+\begin{center}
+\includegraphics[width=.9\linewidth]{images/fig10.png}
+\end{center}
+\end{column}
+\end{columns}
 \end{frame}
 \end{document}
