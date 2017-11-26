@@ -48,8 +48,6 @@ run gp01.py
 name = 'images/fig01.png';
 #+END_SRC
 
-#+RESULTS:
-
 
 #+BEGIN_SRC python :session :exports code
 from matplotlib.pyplot import figure, plot, savefig, close, legend
@@ -206,6 +204,7 @@ run gp02.py
 name = 'images/fig04.png';
 #+END_SRC
 
+
 *** Fitting some data
 
 **** :BMCOL:
@@ -225,13 +224,15 @@ f_m, V, _ = compPosterior(y, x, k, X, 0.01)
 
 s = sqrt(diag(V))
 
-plot(X, f_m, 'r')
-plot(X, f_m + 2*s, 'r--')
-plot(X, f_m - 2*s, 'r--')
+plot(X, f_m, '--r', label='mean')
+fill_between(X, f_m - 2*s, f_m + 2*s, color = 'b',
+       alpha = 0.1, label='95% confidence interval')
 for i in range(5):
   plot(X, genSamples(X, f_m, V))
-plot(x, y, 'ob')
+plot(x, y, 'ob', label='data')
+legend()
 #+END_SRC
+
 
 
 **** :BMCOL:
@@ -245,7 +246,6 @@ savefig(name); name
 
 #+RESULTS:
 [[file:images/fig04.png]]
-
 
 
 ** Python toolboxes
@@ -346,5 +346,34 @@ savefig(name); name
 [[file:images/fig06.png]]
 
 
+*** PyMC3
+
+*** Edward
+
+*** PyStan
+
+** Haskell code
+
+*** Sampling from prior: Haskell code
+
+#+INCLUDE: "./gp01.hs" src haskell
+
+#+BEGIN_SRC haskell :exports none
+:l gp01.hs
+name = "images/fig07.png"
+#+END_SRC
 
 
+#+BEGIN_SRC haskell :exports code :file images/fig07.png
+import Graphics.Matplotlib
+
+let x =  linspace 150 (-5, 5) :: DVector
+let k = rbf 1
+
+y <- sequence [genSamplesSimple x k | i <- [1..3]]
+file name $ plot x (y!!0) % plot x (y!!1) % plot x (y!!2)
+#+END_SRC
+
+*** Random functions in 1D
+
+[[file:images/fig07.png]]

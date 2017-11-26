@@ -1,4 +1,4 @@
-% Created 2017-11-25 Sat 23:21
+% Created 2017-11-26 Sun 02:46
 % Intended LaTeX compiler: pdflatex
 \documentclass[presentation]{beamer}
 \usepackage[utf8]{inputenc}
@@ -39,10 +39,10 @@
 
 
 \section{Regression}
-\label{sec:org3d71448}
+\label{sec:org478f96c}
 \subsection{Sampling from prior}
-\label{sec:org64f8d75}
-\begin{frame}[label={sec:orgdcb592e}]{GP prior}
+\label{sec:org496a9bb}
+\begin{frame}[label={sec:orgf96bf03}]{GP prior}
 \begin{eqnarray} \label{eg:GP}
 k({x},{y}) & = & \mathrm{exp}( -\tfrac{1}{2}|{x}-{y}|^2) \\
 \mathbf{f} & \sim & \mathcal{N}(\mathbf{0}, K(\mathbf{x}, \mathbf{x}))
@@ -50,7 +50,7 @@ k({x},{y}) & = & \mathrm{exp}( -\tfrac{1}{2}|{x}-{y}|^2) \\
 \end{frame}
 
 
-\begin{frame}[fragile,label={sec:org8e2c1de}]{Sampling from prior: Python code}
+\begin{frame}[fragile,label={sec:orga9b4379}]{Sampling from prior: Python code}
  \begin{minted}[]{ipython}
 from numpy import sum, eye, exp #, zeros
 from numpy.linalg import cholesky
@@ -89,14 +89,14 @@ for i in range(3): plot(x, genSamplesSimple(x,k));
 
 
 
-\begin{frame}[label={sec:org784dca8}]{Random functions in 1D}
+\begin{frame}[label={sec:org324f96e}]{Random functions in 1D}
 \begin{center}
 \includegraphics[width=.9\linewidth]{images/fig01.png}
 \end{center}
 \end{frame}
 
 
-\begin{frame}[fragile,label={sec:orgc683272}]{Different length scales}
+\begin{frame}[fragile,label={sec:org3128776}]{Different length scales}
  \begin{columns}
 \begin{column}{0.45\columnwidth}
 \begin{minted}[]{python}
@@ -116,7 +116,7 @@ legend(scales)
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org567c09a}]{Two dimensions}
+\begin{frame}[fragile,label={sec:org2b9dcf5}]{Two dimensions}
  \begin{columns}
 \begin{column}{0.4\columnwidth}
 \begin{minted}[]{python}
@@ -164,8 +164,8 @@ ax.set_zlim(-2.5, 2.5)
 
 
 \subsection{Posterior}
-\label{sec:org3a2e343}
-\begin{frame}[label={sec:org9830ef7}]{Computing posterior}
+\label{sec:org64538f0}
+\begin{frame}[label={sec:org202d76c}]{Computing posterior}
 \begin{eqnarray*}
 \left[ \begin{array}{c} \mathbf{y} \\ \mathbf{f}_* \end{array} \right]
 & \sim & \mathcal{N}\left( \mathbf{0},
@@ -189,7 +189,7 @@ V & = & L^{-1} K(X,X_*)
 \end{eqnarray*}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgae35b2d}]{Python code}
+\begin{frame}[fragile,label={sec:orgcae9f33}]{Python code}
  \begin{minted}[]{ipython}
 from numpy import pi, eye, log, diag
 from numpy.random import normal
@@ -214,7 +214,7 @@ def genSamples(x, m, K):
 \end{minted}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgc85e828}]{Fitting some data}
+\begin{frame}[fragile,label={sec:org7b6924d}]{Fitting some data}
  \begin{columns}
 \begin{column}{0.35\columnwidth}
 \begin{minted}[]{python}
@@ -229,14 +229,16 @@ f_m, V, _ = compPosterior(y, x, k, X, 0.01)
 
 s = sqrt(diag(V))
 
-plot(X, f_m, 'r')
-plot(X, f_m + 2*s, 'r--')
-plot(X, f_m - 2*s, 'r--')
+plot(X, f_m, '--r', label='mean')
+fill_between(X, f_m - 2*s, f_m + 2*s, color = 'b',
+       alpha = 0.1, label='95% confidence interval')
 for i in range(5):
   plot(X, genSamples(X, f_m, V))
-plot(x, y, 'ob')
+plot(x, y, 'ob', label='data')
+legend()
 \end{minted}
 \end{column}
+
 
 
 \begin{column}{0.55\columnwidth}
@@ -248,10 +250,9 @@ plot(x, y, 'ob')
 \end{frame}
 
 
-
 \subsection{Python toolboxes}
-\label{sec:orgc9ade99}
-\begin{frame}[fragile,label={sec:org3522d36}]{scikit-learn}
+\label{sec:orgc4dc1bc}
+\begin{frame}[fragile,label={sec:org97e5b4c}]{scikit-learn}
  \begin{columns}
 \begin{column}{0.43\columnwidth}
 \begin{minted}[]{python}
@@ -294,7 +295,7 @@ plot(X, f_m + 2*s, 'g:'); plot(X, f_m - 2*s, 'g:')
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org5ac90d9}]{GPFlow}
+\begin{frame}[fragile,label={sec:orgabd5de5}]{GPFlow}
  \begin{columns}
 \begin{column}{0.43\columnwidth}
 \begin{minted}[]{python}
@@ -329,5 +330,57 @@ plot(X, f_m + 2*s, 'g:'); plot(X, f_m - 2*s, 'g:')
 \end{center}
 \end{column}
 \end{columns}
+\end{frame}
+
+
+\begin{frame}[label={sec:orgbb61594}]{PyMC3}
+\end{frame}
+
+\begin{frame}[label={sec:orgcf4cd38}]{Edward}
+\end{frame}
+
+\begin{frame}[label={sec:org1ea5bba}]{PyStan}
+\end{frame}
+
+\subsection{Haskell code}
+\label{sec:org6129ca5}
+
+\begin{frame}[fragile,label={sec:org059fbf5}]{Sampling from prior: Haskell code}
+ \begin{minted}[]{haskell}
+import Numeric.LinearAlgebra
+
+type DVector = Vector Double
+type DMatrix = Matrix Double
+
+type CovarianceMatrix = Matrix Double
+type Kernel = DVector -> DVector -> CovarianceMatrix 
+
+rbf :: Double -> Kernel
+rbf k x y = exp $ -((asColumn x - asRow y) / scalar k )^2
+
+genSamplesSimple :: DVector -> Kernel -> IO DVector
+genSamplesSimple x k = do
+  r <- randn n 1 -- also see multivariate normal: gaussianSample
+  return $ flatten (tr l <> r)
+  where
+    n = size x
+    l = chol . sym $ k x x + ident n * 1e-8
+\end{minted}
+
+\begin{minted}[]{haskell}
+import Graphics.Matplotlib
+
+let x =  linspace 150 (-5, 5) :: DVector
+let k = rbf 1
+
+y <- sequence [genSamplesSimple x k | i <- [1..3]]
+file name $ plot x (y!!0) % plot x (y!!1) % plot x (y!!2)
+\end{minted}
+\end{frame}
+
+\begin{frame}[label={sec:org093c850}]{Random functions in 1D}
+\begin{center}
+\includegraphics[width=.9\linewidth]{images/fig07.png}
+\end{center}
 \end{frame}
 \end{document}
