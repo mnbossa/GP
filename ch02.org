@@ -23,6 +23,7 @@
 #+LaTeX_HEADER: \setminted[ipython]{frame=lines, fontsize=\tiny}
 #+LaTeX_HEADER: \setminted[python]{frame=lines, fontsize=\tiny}
 #+LaTeX_HEADER: \setminted[haskell]{frame=lines, fontsize=\tiny}
+#+LaTeX_HEADER: \setminted[c]{frame=lines, fontsize=\tiny}
 
 #+LaTeX_HEADER: \usefonttheme[onlymath]{serif}
 
@@ -348,9 +349,79 @@ savefig(name); name
 
 *** PyMC3
 
+# PyMC3_tmp.org
+
 *** Edward
 
 *** PyStan
+
+#+INCLUDE: "./stan-models/Gp00.c" src c
+
+*** 
+**** Naive code
+
+#+INCLUDE: "./stan-models/Gp01.c" src c
+
+*** 
+**** :BMCOL:
+   :PROPERTIES:
+   :BEAMER_col: 0.55
+   :END:
+
+#+BEGIN_SRC python :session :exports code
+# Random functions in 1D
+
+from pystan import stan
+
+N = 150
+x = linspace(-5,5,N)
+data = {'N': N, 'x': x, 'alpha': 1, 'rho': 1, 'sigma': 1e-4}
+
+model_filename = "stan-models/Gp00.c"
+nchains = 1; nthin=1; niter = 1;
+fit_GP = stan(file=model_filename, data=data, iter=niter,
+                                   thin=nthin, chains=nchains)
+
+figure();
+for i in range(3):
+  fit_GP = stan(fit=fit_GP, data=data, iter=niter,
+                            thin=nthin, chains=nchains)
+  plot(x,fit_GP['y'][0]);
+
+#+END_SRC
+
+#+BEGIN_SRC python :session :exports code
+# Different length scales
+
+figure()
+for i in range(3):
+  data['rho'] = scales[i]
+  fit_GP = stan(fit=fit_GP, data=data, iter=niter,
+                            thin=nthin, chains=nchains)
+  plot(x,fit_GP['y'][0]);
+
+#+END_SRC
+
+**** :BMCOL:
+   :PROPERTIES:
+   :BEAMER_col: 0.4
+   :END:
+
+#+BEGIN_SRC python :session :exports results :results file
+name = "images/figStan01.png"
+savefig(name); name
+#+END_SRC
+
+#+RESULTS:
+[[file:images/figStan01.png]]
+
+#+BEGIN_SRC python :session :exports results :results file
+name = "images/figStan02.png"
+savefig(name); name
+#+END_SRC
+
+#+RESULTS:
+[[file:images/figStan02.png]]
 
 ** Haskell code
 

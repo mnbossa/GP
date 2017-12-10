@@ -1,4 +1,4 @@
-% Created 2017-11-26 Sun 22:34
+% Created 2017-12-11 Mon 00:34
 % Intended LaTeX compiler: pdflatex
 \documentclass[presentation]{beamer}
 \usepackage[utf8]{inputenc}
@@ -18,6 +18,7 @@
 \setminted[ipython]{frame=lines, fontsize=\tiny}
 \setminted[python]{frame=lines, fontsize=\tiny}
 \setminted[haskell]{frame=lines, fontsize=\tiny}
+\setminted[c]{frame=lines, fontsize=\tiny}
 \usefonttheme[onlymath]{serif}
 \usetheme{Boadilla}
 \date{}
@@ -39,10 +40,10 @@
 
 
 \section{Regression}
-\label{sec:org1e56278}
+\label{sec:orgfc9def8}
 \subsection{Sampling from prior}
-\label{sec:orgff85f5b}
-\begin{frame}[label={sec:org7716c90}]{GP prior}
+\label{sec:org30110d1}
+\begin{frame}[label={sec:org6fd10ba}]{GP prior}
 \begin{eqnarray} \label{eg:GP}
 k({x},{y}) & = & \mathrm{exp}( -\tfrac{1}{2}|{x}-{y}|^2) \\
 \mathbf{f} & \sim & \mathcal{N}(\mathbf{0}, K(\mathbf{x}, \mathbf{x}))
@@ -50,7 +51,7 @@ k({x},{y}) & = & \mathrm{exp}( -\tfrac{1}{2}|{x}-{y}|^2) \\
 \end{frame}
 
 
-\begin{frame}[fragile,label={sec:orga64b8c0}]{Sampling from prior: Python code}
+\begin{frame}[fragile,label={sec:org5cf3e27}]{Sampling from prior: Python code}
  \begin{minted}[]{ipython}
 from numpy import sum, eye, exp #, zeros
 from numpy.linalg import cholesky
@@ -89,14 +90,14 @@ for i in range(3): plot(x, genSamplesSimple(x,k));
 
 
 
-\begin{frame}[label={sec:orgdb50f61}]{Random functions in 1D}
+\begin{frame}[label={sec:orge954560}]{Random functions in 1D}
 \begin{center}
 \includegraphics[width=.9\linewidth]{images/fig01.png}
 \end{center}
 \end{frame}
 
 
-\begin{frame}[fragile,label={sec:org9702e2c}]{Different length scales}
+\begin{frame}[fragile,label={sec:org3c02509}]{Different length scales}
  \begin{columns}
 \begin{column}{0.45\columnwidth}
 \begin{minted}[]{python}
@@ -116,7 +117,7 @@ legend(scales)
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org41badcd}]{Two dimensions}
+\begin{frame}[fragile,label={sec:orgbe2824c}]{Two dimensions}
  \begin{columns}
 \begin{column}{0.4\columnwidth}
 \begin{minted}[]{python}
@@ -164,8 +165,8 @@ ax.set_zlim(-2.5, 2.5)
 
 
 \subsection{Posterior}
-\label{sec:org4e46858}
-\begin{frame}[label={sec:orgd710ae9}]{Computing posterior}
+\label{sec:orge4bc5d4}
+\begin{frame}[label={sec:org155cbbf}]{Computing posterior}
 \begin{eqnarray*}
 \left[ \begin{array}{c} \mathbf{y} \\ \mathbf{f}_* \end{array} \right]
 & \sim & \mathcal{N}\left( \mathbf{0},
@@ -189,7 +190,7 @@ V & = & L^{-1} K(X,X_*)
 \end{eqnarray*}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgdfdf0f8}]{Python code}
+\begin{frame}[fragile,label={sec:org0a98677}]{Python code}
  \begin{minted}[]{ipython}
 from numpy import pi, eye, log, diag
 from numpy.random import normal
@@ -214,7 +215,7 @@ def genSamples(x, m, K):
 \end{minted}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgaf909bf}]{Fitting some data}
+\begin{frame}[fragile,label={sec:orgef293e0}]{Fitting some data}
  \begin{columns}
 \begin{column}{0.35\columnwidth}
 \begin{minted}[]{python}
@@ -251,8 +252,8 @@ legend()
 
 
 \subsection{Python toolboxes}
-\label{sec:orgd2ed9ef}
-\begin{frame}[fragile,label={sec:org34ca857}]{scikit-learn}
+\label{sec:orga0a4c0e}
+\begin{frame}[fragile,label={sec:org11a3ae6}]{scikit-learn}
  \begin{columns}
 \begin{column}{0.43\columnwidth}
 \begin{minted}[]{python}
@@ -295,7 +296,7 @@ plot(X, f_m + 2*s, 'g:'); plot(X, f_m - 2*s, 'g:')
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgd1730e3}]{GPFlow}
+\begin{frame}[fragile,label={sec:org0fef3ef}]{GPFlow}
  \begin{columns}
 \begin{column}{0.43\columnwidth}
 \begin{minted}[]{python}
@@ -333,19 +334,134 @@ plot(X, f_m + 2*s, 'g:'); plot(X, f_m - 2*s, 'g:')
 \end{frame}
 
 
-\begin{frame}[label={sec:org7352c7a}]{PyMC3}
+\begin{frame}[label={sec:org06a41b7}]{PyMC3}
 \end{frame}
 
-\begin{frame}[label={sec:org2f5ab8a}]{Edward}
+\begin{frame}[label={sec:orgbaada79}]{Edward}
 \end{frame}
 
-\begin{frame}[label={sec:orgc65f091}]{PyStan}
+\begin{frame}[fragile,label={sec:org203aeb0}]{PyStan}
+ \begin{minted}[]{c}
+data {
+  int<lower=1> N;
+  real x[N];
+  real<lower=0> alpha;
+  real<lower=0> rho;
+  real<lower=0> sigma;
+}
+transformed data {
+  matrix[N, N] K = cov_exp_quad(x, alpha, rho);
+  matrix[N, N] L;
+  vector[N] mu = rep_vector(0, N);
+  for (n in 1:N)
+    K[n, n] = K[n, n] + sigma^2;
+  L = cholesky_decompose(K);
+}
+// this should not be necessary when fixed_param option is set,
+// but "The fixed_param sampler doesn't work in PyStan v2.9.0."
+parameters {  real<lower=0, upper=1> theta; }
+generated quantities {
+  vector[N] y;
+  vector[N] eta;
+  for (n in 1:N)
+    eta[n] = normal_rng(0, 1);
+  y = mu + L*eta;
+}
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile,label={sec:org80a0b31}]{}
+ \begin{block}{Naive code}
+\begin{minted}[]{c}
+data {
+  int<lower=1> N;
+  real x[N];
+  real<lower=0> alpha;
+  real<lower=0> rho;
+  real<lower=0> sigma;
+}
+transformed data {
+  matrix[N, N] K = cov_exp_quad(x, alpha, rho);
+  vector[N] mu = rep_vector(0, N);
+  for (n in 1:N)
+    K[n, n] = K[n, n] + sigma^2;
+}
+/*
+  transformed data {
+  matrix[N, N] K;
+  vector[N] mu = rep_vector(0, N);
+  for (i in 1:(N - 1)) {
+  K[i, i] = alpha^2 + sigma^2;
+  for (j in (i + 1):N) {
+  K[i, j] = alpha^2 * exp(-0.5/rho^2 * square(x[i] - x[j]));
+  K[j, i] = K[i, j];
+  }
+  }
+  K[N, N] = alpha^2 + sigma^2;
+  }
+*/
+generated quantities {
+  vector[N] y;
+  y = multi_normal_rng(mu, K);
+}
+\end{minted}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile,label={sec:org750f981}]{}
+ \begin{columns}
+\begin{column}{0.55\columnwidth}
+\begin{minted}[]{python}
+# Random functions in 1D
+
+from pystan import stan
+
+N = 150
+x = linspace(-5,5,N)
+data = {'N': N, 'x': x, 'alpha': 1, 'rho': 1, 'sigma': 1e-4}
+
+model_filename = "stan-models/Gp00.c"
+nchains = 1; nthin=1; niter = 1;
+fit_GP = stan(file=model_filename, data=data, iter=niter,
+                                   thin=nthin, chains=nchains)
+
+figure();
+for i in range(3):
+  fit_GP = stan(fit=fit_GP, data=data, iter=niter,
+                            thin=nthin, chains=nchains)
+  plot(x,fit_GP['y'][0]);
+
+\end{minted}
+
+\begin{minted}[]{python}
+# Different length scales
+
+figure()
+for i in range(3):
+  data['rho'] = scales[i]
+  fit_GP = stan(fit=fit_GP, data=data, iter=niter,
+                            thin=nthin, chains=nchains)
+  plot(x,fit_GP['y'][0]);
+
+\end{minted}
+\end{column}
+
+\begin{column}{0.4\columnwidth}
+\begin{center}
+\includegraphics[width=.9\linewidth]{images/figStan01.png}
+\end{center}
+
+\begin{center}
+\includegraphics[width=.9\linewidth]{images/figStan02.png}
+\end{center}
+\end{column}
+\end{columns}
 \end{frame}
 
 \subsection{Haskell code}
-\label{sec:orgba9b81b}
+\label{sec:orga38df75}
 
-\begin{frame}[fragile,label={sec:org600c7d3}]{Sampling from prior: Haskell code}
+\begin{frame}[fragile,label={sec:org1dd3863}]{Sampling from prior: Haskell code}
  \begin{minted}[]{haskell}
 module Gp00 where
 import Numeric.LinearAlgebra
@@ -377,7 +493,7 @@ genSamplesSimple x k = do
 \end{minted}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgc07a768}]{Random functions in 1D}
+\begin{frame}[fragile,label={sec:org3d3c0f4}]{Random functions in 1D}
  \begin{columns}
 \begin{column}{0.55\columnwidth}
 \begin{minted}[]{haskell}
@@ -417,7 +533,7 @@ file "images/fig08.png" $ plotCurve 0 y' % plotCurve 1 y' % plotCurve 2 y'
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgb5f35fa}]{2D}
+\begin{frame}[fragile,label={sec:org66a987a}]{2D}
  \begin{columns}
 \begin{column}{0.35\columnwidth}
 \begin{minted}[]{haskell}
@@ -463,7 +579,7 @@ file "images/fig09.png" $ contourF fz (-5) 5 (-5) 5 50
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org8996b4b}]{Computing posterior: Haskell code}
+\begin{frame}[fragile,label={sec:org9c76473}]{Computing posterior: Haskell code}
  \begin{minted}[]{haskell}
 import Numeric.LinearAlgebra
 import Gp00
@@ -490,7 +606,7 @@ genSamples x m k = do
 \end{minted}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org4838cd5}]{Fitting some data}
+\begin{frame}[fragile,label={sec:orgf3c9180}]{Fitting some data}
  \begin{columns}
 \begin{column}{0.37\columnwidth}
 \begin{minted}[]{haskell}
@@ -506,12 +622,12 @@ s = sqrt $ takeDiag vf
 z <- sequence [genSamples x' f vf  | i <- [1..5]]
 
 plCurve i = plot (flatten x') (z!!i)
-plCurves i = if i == 1 then plCurve 1 
+plCurves i = if i == 1 then plCurve 1
              else plCurve i % plCurves (i-1)
 
-plMean = plot (flatten x') f @@ [o1 "r--"] 
-plCI1  = plot (flatten x') (f + 2*s) @@ [o1 "r:"] 
-plCI2  = plot (flatten x') (f - 2*s) @@ [o1 "r:"] 
+plMean = plot (flatten x') f @@ [o1 "r--"]
+plCI1  = plot (flatten x') (f + 2*s) @@ [o1 "r:"]
+plCI2  = plot (flatten x') (f - 2*s) @@ [o1 "r:"]
 
 plData =  plot (flatten x) y @@ [o1 "bo"]
 
